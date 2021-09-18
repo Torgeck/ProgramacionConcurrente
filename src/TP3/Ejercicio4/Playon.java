@@ -1,4 +1,4 @@
-package TP3;
+package TP3.Ejercicio4;
 
 public class Playon {
 
@@ -12,24 +12,21 @@ public class Playon {
         this.rueda = null;
     }
 
-    public synchronized void setPlato(Hamster ham) throws InterruptedException{
+    public synchronized void setPlato(Hamster ham){
         this.plato = ham;
         System.out.println(Thread.currentThread().getName() + " esta en el plato");
-        Thread.sleep(1000);
         System.out.println(Thread.currentThread().getName() + " realizo la siguiente actividad: " + ham.getEstado());
     }
 
-    public synchronized void setRueda(Hamster ham) throws InterruptedException{
+    public synchronized void setRueda(Hamster ham){
         this.rueda = ham;
         System.out.println(Thread.currentThread().getName() + " esta en la rueda");
-        Thread.sleep(2000);
         System.out.println(Thread.currentThread().getName() + " realizo la siguiente actividad: " + ham.getEstado());
     }
 
-    public synchronized void setHamaca(Hamster ham) throws InterruptedException{
+    public synchronized void setHamaca(Hamster ham){
         this.hamaca = ham;
         System.out.println(Thread.currentThread().getName() + " esta en la hamaca");
-        Thread.sleep(3000);
         System.out.println(Thread.currentThread().getName() + " realizo la siguiente actividad: " + ham.getEstado());
     }
 }

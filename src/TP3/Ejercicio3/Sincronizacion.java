@@ -1,4 +1,6 @@
-package TP3;
+package TP3.Ejercicio3;
+
+import TP3.Ejercicio3.MiHilo;
 
 public class Sincronizacion {
 

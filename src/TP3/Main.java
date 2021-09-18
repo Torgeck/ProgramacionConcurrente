@@ -1,5 +1,7 @@
 package TP3;
 
+import TP3.Ejercicio5.Cadena;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -22,7 +24,9 @@ public class Main {
         o.start();
         c.start();*/
 
-        Playon p = new Playon();
+        //Ejercicio 4
+
+/*        Playon p = new Playon();
 
         Hamster h1 = new Hamster(p);
         Hamster h2 = new Hamster(p);
@@ -40,6 +44,22 @@ public class Main {
         t2.start();
         t3.start();
         t4.start();
-        t5.start();
+        t5.start();*/
+
+        //Ejercicio 5
+
+        Cadena cadena = new Cadena();
+        Letra A = new Letra('A', cadena);
+        Letra B = new Letra('B', cadena);
+        Letra C = new Letra('C', cadena);
+
+        Thread h1 = new Thread(A);
+        Thread h2 = new Thread(B);
+        Thread h3 = new Thread(C);
+
+        h1.start();
+        h2.start();
+        h3.start();
+
     }
 }

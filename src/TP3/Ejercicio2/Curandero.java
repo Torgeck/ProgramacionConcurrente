@@ -1,4 +1,7 @@
-package TP3;
+package TP3.Ejercicio2;
+
+import TP3.Ejercicio2.Orco;
+import TP3.Ejercicio2.Personaje;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,7 +19,7 @@ public class Curandero implements Runnable{
         try {
             this.curarVida(this.personaje);
         }catch (InterruptedException exc){
-            Logger.getLogger(TP3.Orco.class.getName()).log(Level.SEVERE,null,exc);
+            Logger.getLogger(Orco.class.getName()).log(Level.SEVERE,null,exc);
         }
     }
 
