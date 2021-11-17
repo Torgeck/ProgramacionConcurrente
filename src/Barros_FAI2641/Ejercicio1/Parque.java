@@ -1,8 +1,6 @@
 package Barros_FAI2641.Ejercicio1;
 
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class Parque {
 
