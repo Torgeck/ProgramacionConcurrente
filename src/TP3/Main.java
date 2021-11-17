@@ -1,6 +1,7 @@
 package TP3;
 
 import TP3.Ejercicio5.Cadena;
+import TP3.Ejercicio5.Letra;
 
 public class Main {
 
@@ -48,7 +49,7 @@ public class Main {
 
         //Ejercicio 5
 
-        Cadena cadena = new Cadena();
+   /*     Cadena cadena = new Cadena();
         Letra A = new Letra('A', cadena);
         Letra B = new Letra('B', cadena);
         Letra C = new Letra('C', cadena);
@@ -60,6 +61,6 @@ public class Main {
         h1.start();
         h2.start();
         h3.start();
-
+*/
     }
 }
