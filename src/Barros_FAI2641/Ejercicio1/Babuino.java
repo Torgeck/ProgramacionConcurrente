@@ -11,15 +11,6 @@ public class Babuino implements Runnable {
     }
 
     public void run() {
-        intentaCruzar();
-    }
-
-    public void avisarGerente(){
-        if(parque.cruzaronTodos())
-            System.out.println("Ya cruzamos todos");
-    }
-
-    public void intentaCruzar(){
         String nombre = Thread.currentThread().getName();
 
         try {

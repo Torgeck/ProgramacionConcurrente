@@ -11,7 +11,6 @@ public class Parque {
     private int babuinosDer;    //Se utiliza para conta la cantidad de babuinos que se pasaron a la derecha
     private Semaphore cruzeDiario = new Semaphore(0);         //Lo utiliza el supervisor al finalizar el cruze del dia
     private Semaphore cuerda = new Semaphore(1);        //Los babuinos no respetan ordenes de llegada
-    private Lock mutex = new ReentrantLock();                   //Se utiliza para proteger los contadores
 
     Parque(int b){
         this.babuinos = b;
@@ -29,10 +28,10 @@ public class Parque {
     }
 
     public void soltarCuerda(char lado){
-        //Termina de cruzar la cuerda y se añade un contador al lado correspondiente
-        cuerda.release();
         //Incrementa el contador del lado destino del babuino
         incrementarContador(lado);
+        //Termina de cruzar la cuerda y se añade un contador al lado correspondiente
+        cuerda.release();
         //Si cruzaron todos el supervisor avisa
         if(cruzaronTodos())
             cruzeDiario.release();
@@ -46,13 +45,11 @@ public class Parque {
     public void incrementarContador(char lado){
         //Incrementan de destino, esta accion esta protegida por un lock, se podria utilizar un bloque sincronizado para hacer lo mismo
         try {
-            mutex.lock();
             if (lado == 'I')
                 babuinosDer++;
             else
                 babuinosIzq++;
         }finally {
-            mutex.unlock();
         }
     }
 

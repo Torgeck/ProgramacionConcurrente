@@ -17,11 +17,13 @@ public class Main {
     }
 
     private static void creaIniciaBabuinos(int cantidadBabuinos, Parque parque, Thread[] babuinos) {
-        for(int i = 0; i < cantidadBabuinos; i++){
-            char lado = ladoRandom();
-            babuinos[i] = new Thread(new Babuino(lado, parque), "Babuino " + i);
-            babuinos[i].start();
-        }
+            for (int i = 0; i < cantidadBabuinos; i++) {
+                char lado = ladoRandom();
+                babuinos[i] = new Thread(new Babuino(lado, parque), "Babuino " + i);
+                babuinos[i].start();
+               // babuinos[i].join(); SI LO HAGO CON JOIN NO SE CREA SITUACION DE CONCURRENCIA ES MUY SECUENCIAL
+            }
+
     }
 
     public static char ladoRandom(){
