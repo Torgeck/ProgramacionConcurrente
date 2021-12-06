@@ -9,7 +9,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class Planta {
 
-    private final int TIPO_CAJA = 2;
     private final int BOTELLAS_MAX = 10;
     private final int CAP_ALMACEN = 100;
     private int capActAlmacen = 0;
@@ -199,8 +198,4 @@ public class Planta {
             mutexEmpCam.unlock();
         }
     }
-
-
-
-
 }
