@@ -44,7 +44,7 @@ public class Planta {
 
     // Embotellador
 
-    public boolean preparaBotella(int id){
+    public boolean preparaCargaBotella(int id){
         //Retorna el tipo de botella que va a cargar el embotellador de manera aleatoria
         boolean tipo = TIPO_BOTELLA.nextBoolean();
 
@@ -54,8 +54,8 @@ public class Planta {
         return tipo;
     }
 
-    public void cargaBotella(int id, boolean tipo) throws InterruptedException{
-        //Metodo que agrega botellas a cajas segun su tipo
+    public void verificaEstadoCaja(int id, boolean tipo) throws InterruptedException{
+        //Metodo que verifica si la caja del embotellador [id] del [tipo] esta llena o tiene lugar
         mutexEmbEmp.lock();
         try{
             /*System.out.println("Botellas actuales "+cajasEmbotellador.get(id).getCajaTipo(tipo).getBotellasAct()+ " en caja de " + (tipo ? "vino":"gaseosa"));*/      //Debug
