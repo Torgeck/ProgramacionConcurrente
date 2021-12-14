@@ -3,6 +3,7 @@ package PracticasSegundoParcial.Ejercicio1;
 import java.time.Clock;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Random;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -14,13 +15,14 @@ public class Planta {
     private int capActAlmacen = 0;
     private int cantidadEmbotelladores;
     private long tiempoMad;
-    private HashMap<Integer, DuplaCaja> cajasEmbotellador = new HashMap<>();
-    private LinkedList <Caja> cajasAlmacen = new LinkedList<>();
-    private Lock mutexEmbEmp = new ReentrantLock();
-    private Lock mutexEmpCam = new ReentrantLock();
-    private Condition hayLugarCaja = mutexEmbEmp.newCondition(), hayCajaLlena = mutexEmbEmp.newCondition();
-    private Condition hayLugarAlmacen = mutexEmpCam.newCondition(), hayAlmacenLleno = mutexEmpCam.newCondition();
-    private Clock relojPlanta = Clock.systemDefaultZone();
+    private HashMap<Integer, DuplaCaja> cajasEmbotellador = new HashMap<>();                                                  //Simboliza la linea de cajas de los embotelladores
+    private LinkedList <Caja> cajasAlmacen = new LinkedList<>();                                                              //Simboliza el espacio en el almacen
+    private final Lock mutexEmbEmp = new ReentrantLock();                                                                     //Se usa para las interacciones de embotellador y empaquetador
+    private final Lock mutexEmpCam = new ReentrantLock();                                                                     //Se usa para las interacciones de empaquetador y camion
+    private final Condition hayLugarCaja = mutexEmbEmp.newCondition(), hayCajaLlena = mutexEmbEmp.newCondition();
+    private final Condition hayLugarAlmacen = mutexEmpCam.newCondition(), hayAlmacenLleno = mutexEmpCam.newCondition();
+    private final Clock relojPlanta = Clock.systemDefaultZone();                                                              //Se usa para simular el tiempo de maduracion de los vinos
+    private final Random tipoBotella = new Random();
 
     public Planta (int cantEmbo, long tiempoMad){
         this.tiempoMad = tiempoMad;
@@ -40,9 +42,19 @@ public class Planta {
 
     // Embotellador
 
-    public void preparaBotella(int id, boolean tipo) throws InterruptedException {
+    public boolean preparaBotella(){
+        //Retorna el tipo de botella que va a cargar el embotellador de manera aleatoria
+        return tipoBotella.nextBoolean();
+    }
+
+    public void cargaBotella(int id, boolean tipo) throws InterruptedException{
+        //Metodo que agrega botellas a cajas segun su tipo
         mutexEmbEmp.lock();
         try{
+            //Agrego a mi caja correspondiente una botella del mismo tipo
+            cajasEmbotellador.get(id).getCajaTipo(tipo).agregarBotella();
+
+            //System.out.println("Botellas actuales "+cajasEmbotellador.get(id).getCajaTipo(tipo).getBotellasAct()+ " en caja de vino: " +tipo);
             //Si la caja esta llena
             while(cajasEmbotellador.get(id).getCajaTipo(tipo).estaLlena()){
                 System.out.println("******* CAJA__________LLENA ********");
@@ -50,17 +62,7 @@ public class Planta {
                 hayCajaLlena.signal();
                 hayLugarCaja.await();
             }
-        }finally {
-            mutexEmbEmp.unlock();
-        }
-    }
 
-    public void cargaBotellas (int id, boolean tipo){
-        mutexEmbEmp.lock();
-        try{
-            //Agrego a mi caja correspondiente una botella del mismo tipo
-            cajasEmbotellador.get(id).getCajaTipo(tipo).agregarBotella();
-            System.out.println("Botellas actules "+cajasEmbotellador.get(id).getCajaTipo(tipo).getBotellasAct()+ " en caja de vino: " +tipo);
         }finally {
             mutexEmbEmp.unlock();
         }
@@ -78,6 +80,7 @@ public class Planta {
             //Veo si alguien tiene alguna caja llena
             while ( embotellador < cantidadEmbotelladores && cajaIncompleta){
 
+                //Si alguien tiene la caja llena salgo
                 if(cajasEmbotellador.get(embotellador).getCajaLlena() != null) {
                     cajaIncompleta = false;
                 }
@@ -85,11 +88,9 @@ public class Planta {
                     //Me fijo en el siguiente
                     embotellador++;
 
-                    //Si se fijo en todos los embotelladores
+                    //Si me fije en todos los embotelladores
                     if (embotellador == cantidadEmbotelladores) {
-                        System.out.println();
                         embotellador = 0;
-                        cajaIncompleta = true;
                         hayCajaLlena.await();
                     }
                 }
@@ -101,27 +102,27 @@ public class Planta {
         return embotellador;
     }
 
-    public Caja guardarCaja(int embotellador)throws InterruptedException{
+    public Caja guardarCaja(int embotellador) throws InterruptedException{
+        //Metodo que recibe el id del embotellador y con el obtiene y guarda la caja en el almacen si es que hay espacio
         mutexEmpCam.lock();
-        Caja cajaLlena = null;
+        Caja cajaLlena;
         try{
+
+            //Obtiene la caja llena del embotellador
+            cajaLlena = cajasEmbotellador.get(embotellador).getCajaLlena();
+            //La etiqueta con el tiempo actual de la planta
+            cajaLlena.setTiempoEmp(relojPlanta.millis());
+            //Guarda la caja en el almacen y aumenta la capacidad actual del almacen
+            cajasAlmacen.add(cajaLlena);
+            capActAlmacen += BOTELLAS_MAX;
+
+            System.out.println("CAPACIDAD ALMACEN ACTUAL "+ capActAlmacen);
             //Si no hay lugar en el almacen le avisa al camion y duerme
             while(capActAlmacen == CAP_ALMACEN){
                 System.out.println("-----------------ALMACEN LLENO-------------");
                 hayAlmacenLleno.signal();
                 hayLugarAlmacen.await();
             }
-            //Si hay espacio guarda la caja en el almacen
-
-            //Obtiene la caja llena del embotellador y la guarda en el almacen
-            cajaLlena = cajasEmbotellador.get(embotellador).getCajaLlena();
-            //La etiqueta con el tiempo actual de la planta
-            cajaLlena.setTiempoEmp(relojPlanta.millis());
-
-            cajasAlmacen.add(cajaLlena);
-            capActAlmacen += BOTELLAS_MAX;
-
-            System.out.println("CAPACIDAD ALMACEN ACTUAL "+ capActAlmacen);
         }finally {
             mutexEmpCam.unlock();
         }
@@ -129,21 +130,21 @@ public class Planta {
     }
 
     public void reponeCaja(int embotellador, Caja cajaVieja){
+        //Obtiene el id de embotellador y la caja vieja a reemplazar, crea una nueva dupla y la reasigna al hashmap
         mutexEmbEmp.lock();
         DuplaCaja nuevaDupla;
         try{
-            //Le da una caja nueva y le avisa a todos
-
+            //si es de vino reemplaza esa caja por una nueva
             if(cajaVieja.esVino()){
                 nuevaDupla = new DuplaCaja(new Caja(cajaVieja),cajasEmbotellador.get(embotellador).getGaseosa());
             }
+            //Si es de gaseosa reemplaza esa caja por una nueva
             else{
                 nuevaDupla = new DuplaCaja(cajasEmbotellador.get(embotellador).getVino(), new Caja(cajaVieja));
             }
-
+            //Reemplaza la caja vieja por una nueva
             cajasEmbotellador.replace(embotellador,nuevaDupla);
-
-
+            //Avisa a todos para que se fijen si tienen lugar en su caja
             hayLugarCaja.signalAll();
 
         }finally {
@@ -192,7 +193,7 @@ public class Planta {
             }
             System.out.println("El camion dejo el almacen con una capacidad de: "+ capActAlmacen );
 
-            //Una vez que termine de revisar las cajas aviso que se libero espacio y me voy a repartir
+            //Una vez que termine de revisar el almacen aviso que se libero espacio y me voy a repartir
             hayLugarAlmacen.signal();
         }finally {
             mutexEmpCam.unlock();

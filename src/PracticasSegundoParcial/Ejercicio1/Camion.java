@@ -13,6 +13,7 @@ public class Camion implements Runnable{
             while(true){
                 System.out.println("El camion esta esperando en el almacen------------------");
                 planta.inspeccionAlmacen();
+                Thread.sleep(5000);
                 planta.cargaRepartoCajas();
                 System.out.println("El camion sale a repartir ----------------");
                 Thread.sleep(5000);
