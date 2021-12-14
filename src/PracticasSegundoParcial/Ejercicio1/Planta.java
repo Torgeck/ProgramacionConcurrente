@@ -15,14 +15,16 @@ public class Planta {
     private int capActAlmacen = 0;
     private int cantidadEmbotelladores;
     private long tiempoMad;
-    private HashMap<Integer, DuplaCaja> cajasEmbotellador = new HashMap<>();                                                  //Simboliza la linea de cajas de los embotelladores
-    private LinkedList <Caja> cajasAlmacen = new LinkedList<>();                                                              //Simboliza el espacio en el almacen
-    private final Lock mutexEmbEmp = new ReentrantLock();                                                                     //Se usa para las interacciones de embotellador y empaquetador
-    private final Lock mutexEmpCam = new ReentrantLock();                                                                     //Se usa para las interacciones de empaquetador y camion
-    private final Condition hayLugarCaja = mutexEmbEmp.newCondition(), hayCajaLlena = mutexEmbEmp.newCondition();
-    private final Condition hayLugarAlmacen = mutexEmpCam.newCondition(), hayAlmacenLleno = mutexEmpCam.newCondition();
-    private final Clock relojPlanta = Clock.systemDefaultZone();                                                              //Se usa para simular el tiempo de maduracion de los vinos
-    private final Random tipoBotella = new Random();
+    private HashMap<Integer, DuplaCaja> cajasEmbotellador = new HashMap<>();                                            //Simboliza la linea de cajas de los embotelladores
+    private LinkedList <Caja> cajasAlmacen = new LinkedList<>();                                                        //Simboliza el espacio en el almacen
+    private Lock mutexEmbEmp = new ReentrantLock();                                                                     //Se usa para las interacciones de embotellador y empaquetador
+    private Lock mutexEmpCam = new ReentrantLock();                                                                     //Se usa para las interacciones de empaquetador y camion
+    private Condition hayLugarCaja = mutexEmbEmp.newCondition(), hayCajaLlena = mutexEmbEmp.newCondition();
+    private Condition hayLugarAlmacen = mutexEmpCam.newCondition(), hayAlmacenLleno = mutexEmpCam.newCondition();
+    private final Clock RELOJ_PLANTA = Clock.systemDefaultZone();                                                       //Se usa para simular el tiempo de maduracion de los vinos
+    private final Random TIPO_BOTELLA = new Random();
+    /*private final String COLOR = "\033[1;31m";            // Colores para debug
+    private final String RESET = "\033[0m";*/
 
     public Planta (int cantEmbo, long tiempoMad){
         this.tiempoMad = tiempoMad;
@@ -42,22 +44,24 @@ public class Planta {
 
     // Embotellador
 
-    public boolean preparaBotella(){
+    public boolean preparaBotella(int id){
         //Retorna el tipo de botella que va a cargar el embotellador de manera aleatoria
-        return tipoBotella.nextBoolean();
+        boolean tipo = TIPO_BOTELLA.nextBoolean();
+
+        //Agrego a mi caja correspondiente una botella del mismo tipo
+        cajasEmbotellador.get(id).getCajaTipo(tipo).agregarBotella();
+
+        return tipo;
     }
 
     public void cargaBotella(int id, boolean tipo) throws InterruptedException{
         //Metodo que agrega botellas a cajas segun su tipo
         mutexEmbEmp.lock();
         try{
-            //Agrego a mi caja correspondiente una botella del mismo tipo
-            cajasEmbotellador.get(id).getCajaTipo(tipo).agregarBotella();
-
-            //System.out.println("Botellas actuales "+cajasEmbotellador.get(id).getCajaTipo(tipo).getBotellasAct()+ " en caja de vino: " +tipo);
+            /*System.out.println("Botellas actuales "+cajasEmbotellador.get(id).getCajaTipo(tipo).getBotellasAct()+ " en caja de " + (tipo ? "vino":"gaseosa"));*/      //Debug
             //Si la caja esta llena
             while(cajasEmbotellador.get(id).getCajaTipo(tipo).estaLlena()){
-                //System.out.println("******* CAJA__________LLENA ********");
+                /*System.out.println(COLOR+ "******* CAJA LLENA ******** "+Thread.currentThread().getName() + " de tipo: "+ (tipo ? "vino":"gaseosa") + RESET);*/       //Debug
                 //Aviso al empaquetador
                 hayCajaLlena.signal();
                 hayLugarCaja.await();
@@ -88,7 +92,7 @@ public class Planta {
                     //Me fijo en el siguiente
                     embotellador++;
 
-                    //Si me fije en todos los embotelladores
+                    //Si me fije en todos los embotelladores, entonces espero
                     if (embotellador == cantidadEmbotelladores) {
                         embotellador = 0;
                         hayCajaLlena.await();
@@ -111,15 +115,15 @@ public class Planta {
             //Obtiene la caja llena del embotellador
             cajaLlena = cajasEmbotellador.get(embotellador).getCajaLlena();
             //La etiqueta con el tiempo actual de la planta
-            cajaLlena.setTiempoEmp(relojPlanta.millis());
+            cajaLlena.setTiempoEmp(RELOJ_PLANTA.millis());
             //Guarda la caja en el almacen y aumenta la capacidad actual del almacen
             cajasAlmacen.add(cajaLlena);
             capActAlmacen += BOTELLAS_MAX;
 
-            //System.out.println("CAPACIDAD ALMACEN ACTUAL "+ capActAlmacen);
+            /*System.out.println("CAPACIDAD ALMACEN ACTUAL "+ capActAlmacen);*/     //Debug
             //Si no hay lugar en el almacen le avisa al camion y duerme
             while(capActAlmacen == CAP_ALMACEN){
-                //System.out.println("-----------------ALMACEN LLENO-------------");
+                /*System.out.println("-----------------ALMACEN LLENO-------------");*/      //Debug
                 hayAlmacenLleno.signal();
                 hayLugarAlmacen.await();
             }
@@ -182,7 +186,7 @@ public class Planta {
                 //Si la caja es de vino
                 if(cajaAux.esVino()) {
                     //Si no esta madura la vuelve a poner en el almacen
-                    if (!cajaAux.estaMadura(relojPlanta.millis())) {
+                    if (!cajaAux.estaMadura(RELOJ_PLANTA.millis())) {
                         cajasAlmacen.add(cajaAux);
                         capActAlmacen += BOTELLAS_MAX;
                     }
@@ -191,7 +195,7 @@ public class Planta {
                 capActAlmacen -= BOTELLAS_MAX;
                 nroCaja++;
             }
-            System.out.println("El camion dejo el almacen con una capacidad de: "+ capActAlmacen );
+            /*System.out.println("El camion dejo el almacen con una capacidad de: "+ capActAlmacen );*/         //Debug
 
             //Una vez que termine de revisar el almacen aviso que se libero espacio y me voy a repartir
             hayLugarAlmacen.signal();

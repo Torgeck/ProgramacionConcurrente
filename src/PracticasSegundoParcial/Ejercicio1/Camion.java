@@ -17,9 +17,9 @@ public class Camion implements Runnable{
                 planta.inspeccionAlmacen();
                 Thread.sleep(5000);
                 planta.cargaRepartoCajas();
-                System.out.println(COLOR + "El camion sale a repartir ----------------" + RESET);
+                System.out.println(COLOR + "El camion sale a repartir" + RESET);
                 Thread.sleep(5000);
-                System.out.println(COLOR+"El camion volvio de repartir----------"+RESET);
+                System.out.println(COLOR+"El camion volvio de repartir"+RESET);
             }
         }catch (InterruptedException e){
             System.out.println(COLOR+"El camion choco " + e.getMessage() + RESET);

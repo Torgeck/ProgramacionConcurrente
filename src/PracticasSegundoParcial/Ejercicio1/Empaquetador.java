@@ -19,7 +19,7 @@ public class Empaquetador implements Runnable{
 
                 System.out.println(COLOR + "El Empaquetador esta esperando una caja llena" + RESET);
                 idEmbotellador = planta.preparaCaja();
-                System.out.println(COLOR +"El empaquetador saco la caja a embotellador " + idEmbotellador + RESET);
+                System.out.println(COLOR +"El Empaquetador saco la caja a Embotellador " + idEmbotellador + RESET);
                 cajaActual = planta.guardarCaja(idEmbotellador);
                 System.out.println(COLOR +"El Empaquetador guardo la caja en el almacen" + RESET);
                 Thread.sleep(1000);

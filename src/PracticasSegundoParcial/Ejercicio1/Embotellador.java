@@ -15,10 +15,10 @@ public class Embotellador implements Runnable{
         String nombre = Thread.currentThread().getName();
         try{
             while(true){
-                bot = planta.preparaBotella();
-                System.out.println("El "+ nombre +" esta preparando una botella de vino: " + bot);
+                bot = planta.preparaBotella(this.id);
+                System.out.println("El "+ nombre +" esta preparando una botella de "+ (bot ? "vino":"gaseosa"));
                 Thread.sleep(500);
-                System.out.println("El "+ nombre +" agrego una botella a su caja. Era de vino: "+ bot);
+                System.out.println("El "+ nombre +" agrego una botella a su caja. Era de " + (bot ? "vino":"gaseosa"));
                 planta.cargaBotella(this.id, bot);
 
             }
