@@ -57,7 +57,7 @@ public class Planta {
             //System.out.println("Botellas actuales "+cajasEmbotellador.get(id).getCajaTipo(tipo).getBotellasAct()+ " en caja de vino: " +tipo);
             //Si la caja esta llena
             while(cajasEmbotellador.get(id).getCajaTipo(tipo).estaLlena()){
-                System.out.println("******* CAJA__________LLENA ********");
+                //System.out.println("******* CAJA__________LLENA ********");
                 //Aviso al empaquetador
                 hayCajaLlena.signal();
                 hayLugarCaja.await();
@@ -116,10 +116,10 @@ public class Planta {
             cajasAlmacen.add(cajaLlena);
             capActAlmacen += BOTELLAS_MAX;
 
-            System.out.println("CAPACIDAD ALMACEN ACTUAL "+ capActAlmacen);
+            //System.out.println("CAPACIDAD ALMACEN ACTUAL "+ capActAlmacen);
             //Si no hay lugar en el almacen le avisa al camion y duerme
             while(capActAlmacen == CAP_ALMACEN){
-                System.out.println("-----------------ALMACEN LLENO-------------");
+                //System.out.println("-----------------ALMACEN LLENO-------------");
                 hayAlmacenLleno.signal();
                 hayLugarAlmacen.await();
             }
@@ -160,7 +160,7 @@ public class Planta {
         try {
             //Se fija si esta lleno, en caso de no estarlo se queda esperando a que le avisen
             while (capActAlmacen != CAP_ALMACEN) {
-                System.out.println("EL ALMACEN NO ESTA LLENO------------------");
+                //System.out.println("EL ALMACEN NO ESTA LLENO------------------");
                 hayAlmacenLleno.await();
             }
         }finally {

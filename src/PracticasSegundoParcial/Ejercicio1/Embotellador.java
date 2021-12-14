@@ -23,7 +23,7 @@ public class Embotellador implements Runnable{
 
             }
         }catch (InterruptedException e){
-            System.out.println("El embotellador se quemo "+ e.getMessage());
+            System.out.println("El "+ nombre +" se quemo "+ e.getMessage());
         }
     }
 }

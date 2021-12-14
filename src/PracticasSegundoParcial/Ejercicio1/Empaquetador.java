@@ -3,6 +3,9 @@ package PracticasSegundoParcial.Ejercicio1;
 public class Empaquetador implements Runnable{
 
     private Planta planta;
+    private final String COLOR = "\033[1;32m";
+    private final String RESET = "\033[0m";
+
 
     public Empaquetador(Planta planta){
         this.planta = planta;
@@ -14,18 +17,18 @@ public class Empaquetador implements Runnable{
         try {
             while (true) {
 
-                System.out.println("El empaquetador esta esperando una caja llena");
+                System.out.println(COLOR + "El Empaquetador esta esperando una caja llena" + RESET);
                 idEmbotellador = planta.preparaCaja();
-                System.out.println("El empaquetador saco la caja a embotellador " + idEmbotellador);
+                System.out.println(COLOR +"El empaquetador saco la caja a embotellador " + idEmbotellador + RESET);
                 cajaActual = planta.guardarCaja(idEmbotellador);
-                System.out.println("El empaquetador guardo la caja en el almacen");
+                System.out.println(COLOR +"El Empaquetador guardo la caja en el almacen" + RESET);
                 Thread.sleep(1000);
                 planta.reponeCaja(idEmbotellador,cajaActual);
-                System.out.println("El empaquetador repuso la caja al embotellador " + idEmbotellador);
+                System.out.println(COLOR +"El Empaquetador repuso la caja al embotellador " + idEmbotellador + RESET);
 
             }
         } catch (InterruptedException e) {
-            System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa " + e.getMessage());
+            System.out.println(COLOR + "El empaquetador se quemo " + e.getMessage() + RESET);
         }
     }
 }
