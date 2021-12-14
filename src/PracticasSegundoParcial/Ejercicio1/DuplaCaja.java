@@ -31,6 +31,7 @@ public class DuplaCaja {
     }
 
     public Caja getCajaLlena(){
+        //Retorna caja llena si la hay, caso contrario retorna null
         Caja cajaLlena = null;
 
         if(this.vino.estaLlena())

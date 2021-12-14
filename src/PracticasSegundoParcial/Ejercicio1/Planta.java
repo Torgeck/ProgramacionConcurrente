@@ -46,11 +46,18 @@ public class Planta {
 
     public boolean preparaCargaBotella(int id){
         //Retorna el tipo de botella que va a cargar el embotellador de manera aleatoria
+        mutexEmbEmp.lock();
         boolean tipo = TIPO_BOTELLA.nextBoolean();
-
-        //Agrego a mi caja correspondiente una botella del mismo tipo
-        cajasEmbotellador.get(id).getCajaTipo(tipo).agregarBotella();
-
+        try {
+            //Agrego a mi caja correspondiente una botella del mismo tipo
+            cajasEmbotellador.get(id).getCajaTipo(tipo).agregarBotella();
+        }finally {
+            mutexEmbEmp.unlock();
+        }
+        //NOTA: se podria usar un concurrentHashMap para evitarnos los locks a la hora de leer y escribir en el hashmap;
+        // Aca use locks, porque se puede producir inconsistencias a la hora de agregar botellas (Puede que te quiten CPU)
+        // si bien se que bloqueamos al resto de los hilos embotelladores, no se me ocurrio una manera que no rompa el
+        // enunciado, ya que el que "mueve" las cajas es el empaquetador y no el embotellador
         return tipo;
     }
 
